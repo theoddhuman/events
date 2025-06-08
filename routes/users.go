@@ -2,6 +2,7 @@ package routes
 
 import (
 	"events/model"
+	"events/utils"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -34,5 +35,10 @@ func login(context *gin.Context) {
 		context.JSON(http.StatusBadRequest, gin.H{"message": "Couldn't validate credentials"})
 		return
 	}
-	context.JSON(http.StatusCreated, gin.H{"message": "Login successful"})
+	token, err := utils.GenerateToken(user.Email, user.Id)
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{"message": "Couldn't generate token"})
+	}
+
+	context.JSON(http.StatusCreated, gin.H{"message": "Login successful", "token": token})
 }
